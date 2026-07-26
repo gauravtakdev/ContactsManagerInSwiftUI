@@ -237,7 +237,7 @@ Read the complete step-by-step tutorial on Medium:
 
 - Medium: [https://medium.com/gauravtakjaipur](https://medium.com/@gauravtakjaipur)
 - LinkedIn: [https://linkedin.com/in/gauravtakjaipur](https://www.linkedin.com/in/gaurav-kumar-tak-977753348/)
-- GitHub: [https://github.com/YOUR_USERNAME](https://github.com/gauravtakdev)
+- GitHub: [https://github.com/gauravtakdev](https://github.com/gauravtakdev)
 
 ---
 
