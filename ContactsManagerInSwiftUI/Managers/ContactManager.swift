@@ -44,43 +44,41 @@ final class ContactManager {
 
     }
     
-    func fetchContacts() throws -> [ContactModel] {
+    func fetchContacts() async throws -> [ContactModel] {
 
-        var contacts: [ContactModel] = []
+            try await Task.detached(priority: .userInitiated) { [store] in
 
-        let keys: [CNKeyDescriptor] = [
+                var contacts: [ContactModel] = []
 
-            CNContactIdentifierKey as CNKeyDescriptor,
-            CNContactGivenNameKey as CNKeyDescriptor,
-            CNContactFamilyNameKey as CNKeyDescriptor,
-            CNContactPhoneNumbersKey as CNKeyDescriptor
+                let keys: [CNKeyDescriptor] = [
+                    CNContactIdentifierKey as CNKeyDescriptor,
+                    CNContactGivenNameKey as CNKeyDescriptor,
+                    CNContactFamilyNameKey as CNKeyDescriptor,
+                    CNContactPhoneNumbersKey as CNKeyDescriptor
+                ]
 
-        ]
+                let request = CNContactFetchRequest(keysToFetch: keys)
 
-        let request = CNContactFetchRequest(keysToFetch: keys)
+                try store.enumerateContacts(with: request) { contact, _ in
 
-        try store.enumerateContacts(with: request) { contact, _ in
+                    contacts.append(
+                        ContactModel(
+                            id: contact.identifier,
+                            firstName: contact.givenName,
+                            lastName: contact.familyName,
+                            phone: contact.phoneNumbers.first?.value.stringValue ?? ""
+                        )
+                    )
 
-            contacts.append(
+                }
 
-                ContactModel(
-                    id: contact.identifier,
-                    firstName: contact.givenName,
-                    lastName: contact.familyName,
-                    phone: contact.phoneNumbers.first?.value.stringValue ?? ""
-                )
+                return contacts.sorted {
+                    $0.fullName.localizedCaseInsensitiveCompare($1.fullName) == .orderedAscending
+                }
 
-            )
+            }.value
 
         }
-
-        return contacts.sorted {
-
-            $0.fullName < $1.fullName
-
-        }
-
-    }
     
     func deleteContact(
         identifier: String

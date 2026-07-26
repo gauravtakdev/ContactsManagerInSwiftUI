@@ -47,44 +47,51 @@ struct ContactsListView: View {
             
             if permissionManager.hasPermission {
 
-                vm.loadContacts()
+                await vm.loadContacts()
 
             } else {
 
                 let granted = await permissionManager.requestPermission()
 
                 if granted {
-                    vm.loadContacts()
+                    await vm.loadContacts()
                 }
 
             }
 
         }
         .sheet(isPresented: $showAddContact, onDismiss: {
-            vm.loadContacts()
+
+            Task {
+                await vm.loadContacts()
+            }
+
         }) {
             AddContactView()
-        }.overlay {
-            
+        }
+        .overlay {
+
             if permissionManager.isDenied {
 
                 ContentUnavailableView {
 
-                    Label("Contacts Permission Required",
-                          systemImage: "person.crop.circle.badge.exclamationmark")
+                    Label(
+                        "Contacts Permission Required",
+                        systemImage: "person.crop.circle.badge.exclamationmark"
+                    )
 
                 } description: {
 
-                    Text("Please allow Contacts access from Settings to manage your contacts.")
+                    Text(
+                        "Please allow Contacts access from Settings to manage your contacts."
+                    )
 
                 } actions: {
 
                     Button("Open Settings") {
                         permissionManager.openSettings()
                     }
-
                 }
-
             }
 
         }

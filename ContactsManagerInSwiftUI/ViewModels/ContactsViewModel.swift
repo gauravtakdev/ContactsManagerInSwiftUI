@@ -32,34 +32,34 @@ final class ContactsViewModel: ObservableObject {
 
     }
 
-    func loadContacts() {
+    func loadContacts() async {
 
         do {
-
-            contacts = try ContactManager.shared.fetchContacts()
-
-        }
-
-        catch {
-
-            print(error)
-
+            contacts = try await ContactManager.shared.fetchContacts()
+        } catch {
+            print("Failed to load contacts: \(error.localizedDescription)")
         }
 
     }
     
+    @MainActor
     func deleteContact(at offsets: IndexSet) {
 
         guard let index = offsets.first else { return }
 
         let contact = filteredContacts[index]
 
-        do {
-            try ContactManager.shared.deleteContact(identifier: contact.id)
-            loadContacts()
-        } catch {
-            print("Failed to delete contact: \(error.localizedDescription)")
+        Task {
+
+            do {
+                try ContactManager.shared.deleteContact(identifier: contact.id)
+                await loadContacts()
+            } catch {
+                print("Failed to delete contact: \(error.localizedDescription)")
+            }
+
         }
+
     }
 
 }
